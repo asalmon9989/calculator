@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Calculator</title>
+		<link href="styles/style.css" type="text/css" rel="stylesheet">
+	</head>
+	<body>
+		<h1 class="title">Calculator!</h1>
+		<div class="calculator">
+			<div class="display"></div>
+
+			<button class="button clear">Clear</button>
+
+			<button class="num" value="7">7</button>
+			<button class="num" value="8">8</button>
+			<button class="num" value="9">9</button>
+			<button class="divide operator" value="/">/</button>
+
+			<button class="num" value="4">4</button>
+			<button class="num" value="5">5</button>
+			<button class="num" value="6">6</button>
+			<button class="multiply operator" value="*">*</button>
+
+			<button class="num" value="1">1</button>
+			<button class="num" value="2">2</button>
+			<button class="num" value="3">3</button>
+			<button class="subtract operator" value="-">-</button>
+
+			<button class="num" value="0">0</button>
+			<button class="decimal num" value=".">.</button>
+			<button class="equals operator" value="=">=</button>
+			<button class="plus operator" value="+">+</button>
+		</div>
+		<script>
+		let a;
+		let currentOperator;
+		let clearBoxFlag = false;
+
+		function add(a, b) {
+			return a + b;
+		}
+
+		function subtract(a, b) {
+			return a - b;
+		}
+
+		function multiply(a, b) {
+			return a * b;
+		}
+
+		function divide(a, b) {
+			if (b === 0) {
+				return undefined;
+			}
+			return a / b;
+		}
+
+		function operate(operator, a, b) {
+			console.log(a + " " + operator + " " + b);
+			switch (operator) {
+				case "+":
+					return add(a, b);
+				case "-":
+					return subtract(a, b);
+				case "*":
+					return multiply(a, b);
+				case "/":
+					return divide(a, b);
+			}
+		}
+
+		const display = document.querySelector(".display");
+		const clear = document.querySelector(".clear");
+		const decimal = document.querySelector(".decimal");
+		decimal.addEventListener("click", numberInput);
+
+
+		clear.addEventListener("click", clearButton);
+		function clearButton() {
+			a = undefined;
+			clearBoxFlag = false;
+			currentOperator = undefined;
+			display.textContent = "";
+		}
+
+		const numberButtons = document.querySelectorAll(".num");
+		numberButtons.forEach(button => button.addEventListener("click", numberInput));
+
+		document.addEventListener("keydown", function(e)  {
+			if (e.key.match("[0-9.]")) {
+				document.querySelector(`.num[value="${e.key}"]`).click();
+			}
+			else if ("/*-+=".indexOf(e.key) !== -1) {
+				document.querySelector(`.operator[value="${e.key}"]`).click();
+			}
+			else if (e.key === "Enter") {
+				document.querySelector(`.operator[value="="]`).click();
+			}
+			else if (e.key === "Backspace") {
+				backspace();
+			}
+		});
+
+		function numberInput() { 
+			if (clearBoxFlag) {
+				display.textContent = "";
+				clearBoxFlag = false;
+			}
+			if (this.value === "." && display.textContent.indexOf(".") !== -1) {
+				//do nothing
+			}
+			else {
+				display.textContent = display.textContent + this.value;
+			}
+			if (currentOperator === undefined) {  //If this is before an operator is pressed
+				a = Number(display.textContent);
+			}
+		}
+
+
+		const operatorButtons = document.querySelectorAll(".operator");
+		operatorButtons.forEach(button => button.addEventListener("click", operatorPress));
+		function operatorPress() {
+			if (!currentOperator) {
+				if (this.value === "=") {
+					return; //Equals pressed with no arithmetic operators
+				}
+				currentOperator = this.value;
+				clearBoxFlag = true;
+			}
+			else if ((Number(display.textContent) === NaN  || display.textContent === "" || clearBoxFlag) && this.value !== "="){
+				currentOperator = this.value;
+				return;  //An operator was used but "." or "" is in the input field... Updates current operator if = not pressed
+			}
+			else if (this.value === "=") {
+				a = operate(currentOperator, a, Number(display.textContent));
+				clearBoxFlag = true;  //May need to change if want to continue doing operations on the result after pressing equals
+				currentOperator = undefined;
+				display.textContent = a;
+			}
+			else {
+				//TODO: another operand instead of = is pressed
+				a = operate(currentOperator, a, Number(display.textContent));
+				clearBoxFlag = true;  
+				currentOperator = this.value;
+				display.textContent = a;
+			}
+
+		}
+
+
+		function backspace() {
+			if (display.textContent.length > 0) {
+				display.textContent = display.textContent.slice(0, display.textContent.length-1);
+				a = display.textContent;
+			}
+		}
+
+
+
+
+		</script>
+	</body>
+
+
+
+
+</html>
